@@ -1,7 +1,9 @@
 #BlueJ class context
 comment0.target=ShoppingSystem
-comment1.params=product_id\ product_name\ product_price\ product_category
-comment1.target=product(int,\ java.lang.String,\ int,\ java.lang.String)
-comment2.params=args
-comment2.target=void\ main(java.lang.String[])
-numComments=3
+comment1.params=product_id\ product_name\ product_price\ product_quantity
+comment1.target=Product(int,\ java.lang.String,\ double,\ int)
+comment2.params=
+comment2.target=void\ display()
+comment3.params=args
+comment3.target=void\ main(java.lang.String[])
+numComments=4
