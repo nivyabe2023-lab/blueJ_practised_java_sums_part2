@@ -1,98 +1,67 @@
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 class Product {
-    public int product_id;
-    public String product_name;
-    public double product_price;
-    public int product_quantity;
+    // Made these private to follow encapsulation best practices
+    private int id;
+    private String name;
+    private double price;
 
-    public Product(int product_id, String product_name, double product_price, int product_quantity) {
-        this.product_id = product_id;
-        this.product_name = product_name;
-        this.product_price = product_price;
-        this.product_quantity = product_quantity;
+    public Product(int id, String name, double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
     }
 
-    void display() {
-        System.out.println("Product ID: " + this.product_id);
-        System.out.println("Product Name: " + this.product_name);
-        System.out.println("Product Price: " + this.product_price);
-        System.out.println("Product Quantity: " + this.product_quantity);
-    }
+    // Added getters since variables are now private and not directly accessible
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public int getId() { return id; }
 }
 
 class CartItem {
-    public Product p;
+    private Product product;
+    private int quantity; // Moved quantity here because it belongs to the selection, not the product itself
 
-    public CartItem(Product p) {
-        this.p = p;
+    public CartItem(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
     }
 
-    double getTotal() {
-        return p.product_price * p.product_quantity;
+    public double getSubtotal() {
+        // Fetching price via getter from the Product object
+        return product.getPrice() * quantity;
+    }
+
+    public void display() {
+        // Used printf for better alignment and to keep decimals to 2 places
+        System.out.printf("ID: %d | %-15s | Qty: %d | Subtotal: %.2f%n", 
+            product.getId(), product.getName(), quantity, getSubtotal());
     }
 }
 
 class Cart {
-    ArrayList<CartItem> items = new ArrayList<>();
+    // Marked as final to ensure the list reference doesn't change
+    private final ArrayList<CartItem> items = new ArrayList<>();
 
-    void addItem(Product p) {
-        items.add(new CartItem(p));
+    public void addItem(Product p, int qty) {
+        items.add(new CartItem(p, qty));
     }
 
-    void displayCart() {
-        System.out.println("\n--- Cart Items ---");
+    public void displayCart() {
+        System.out.println("\n--- Your Shopping Cart ---");
         for (CartItem item : items) {
-            item.p.display();
-            System.out.println("Item Total: " + item.getTotal());
+            item.display();
         }
     }
 
-    double calculateTotal() {
-        double total = 0;
-        for (CartItem item : items) {
-            total += item.getTotal();
-        }
-        return total;
+    public double calculateTotal() {
+        // Using Stream API to sum up subtotals; much cleaner than a manual loop
+        return items.stream().mapToDouble(CartItem::getSubtotal).sum();
     }
 
-    double applyDiscount(double total) {
-        return total * 0.9;
-    }
-}
-
-public class ShoppingSystem {
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("Enter product details:");
-        
-        System.out.print("Product ID: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        System.out.print("Product Name: ");
-        String name = sc.nextLine();
-
-        System.out.print("Product Price: ");
-        double price = sc.nextDouble();
-
-        System.out.print("Quantity: ");
-        int qty = sc.nextInt();
-
-        Product p1 = new Product(id, name, price, qty);
-
-        Cart cart = new Cart();
-        cart.addItem(p1);
-
-        cart.displayCart();
-        
-        double total = cart.calculateTotal();
-        System.out.println("\nTotal before discount: " + total);
-
-        double finalAmount = cart.applyDiscount(total);
-        System.out.println("Final after discount: " + finalAmount);
+    public double applyDiscount(double total, double percentage) {
+        // Changed to take a percentage parameter so it's not stuck at 10%
+        return total * (1 - (percentage / 100));
     }
 }
